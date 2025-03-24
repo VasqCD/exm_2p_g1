@@ -23,7 +23,7 @@
         android:theme="@style/Theme.PM1E2P_GRUP1"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name=".view.activities.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

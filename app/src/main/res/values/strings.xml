@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Contactos UTM</string>
-    <string name="desc_logo_utm">Logo UTM</string>
+    <string name="app_name">Contactos Group</string>
+    <string name="desc_logo_utm">Logo UTH</string>
     <string name="desc_foto_perfil">Foto de perfil</string>
     <string name="btn_tomar_fotografia">Tomar Fotografía</string>
     <string name="hint_nombre">Nombre</string>
