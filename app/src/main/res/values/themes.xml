@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Tema Base -->
+    <style name="Theme.PM1E2P_GRUP1" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <!-- Colores primarios -->
+        <item name="colorPrimary">@color/green_500</item>
+        <item name="colorPrimaryVariant">@color/green_700</item>
+        <item name="colorOnPrimary">@color/white</item>
+
+        <!-- Colores secundarios -->
+        <item name="colorSecondary">@color/blue_500</item>
+        <item name="colorSecondaryVariant">@color/blue_700</item>
+        <item name="colorOnSecondary">@color/white</item>
+
+        <!-- Estado de la barra y más -->
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+
+        <!-- Estilo de los botones -->
+        <item name="buttonStyle">@style/Widget.PM1E2P_GRUP1.Button</item>
+    </style>
+
+    <!-- Estilo personalizado para botones -->
+    <style name="Widget.PM1E2P_GRUP1.Button" parent="Widget.MaterialComponents.Button">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:paddingStart">24dp</item>
+        <item name="android:paddingEnd">24dp</item>
+    </style>
+
+    <!-- Estilo para botón primario (verde) -->
+    <style name="Widget.PM1E2P_GRUP1.Button.Primary">
+        <item name="backgroundTint">?attr/colorPrimary</item>
+    </style>
+
+    <!-- Estilo para botón secundario (azul) -->
+    <style name="Widget.PM1E2P_GRUP1.Button.Secondary">
+        <item name="backgroundTint">?attr/colorSecondary</item>
+    </style>
+</resources>

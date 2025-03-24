@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Tema Base - Oscuro -->
+    <style name="Theme.PM1E2P_GRUP1" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <!-- Colores primarios -->
+        <item name="colorPrimary">@color/green_300</item>
+        <item name="colorPrimaryVariant">@color/green_500</item>
+        <item name="colorOnPrimary">@color/black</item>
+
+        <!-- Colores secundarios -->
+        <item name="colorSecondary">@color/blue_300</item>
+        <item name="colorSecondaryVariant">@color/blue_500</item>
+        <item name="colorOnSecondary">@color/black</item>
+
+        <!-- Estado de la barra y más -->
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+
+        <!-- Estilo de los botones -->
+        <item name="buttonStyle">@style/Widget.PM1E2P_GRUP1.Button</item>
+    </style>
+</resources>
