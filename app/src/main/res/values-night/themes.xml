@@ -12,6 +12,11 @@
         <item name="colorSecondaryVariant">@color/blue_500</item>
         <item name="colorOnSecondary">@color/black</item>
 
+        <!-- Colores de superficie -->
+        <item name="colorSurface">@color/gray_900</item>
+        <item name="colorSurfaceVariant">@color/gray_900</item>
+        <item name="colorOnSurface">@color/white</item>
+
         <!-- Estado de la barra y más -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
 

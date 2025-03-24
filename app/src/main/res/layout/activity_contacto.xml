@@ -16,26 +16,26 @@
         <!-- Logo UTM -->
         <ImageView
             android:id="@+id/ivLogo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="120dp"
+            android:layout_height="80dp"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="16dp"
             android:contentDescription="@string/desc_logo_utm"
-            tools:src="@tools:sample/avatars" />
+            android:src="@drawable/logo_utm" />
 
         <!-- Contenedor de la foto de perfil -->
         <FrameLayout
             android:layout_width="200dp"
             android:layout_height="200dp"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="8dp"
+            android:background="@color/gray_50">
 
             <ImageView
                 android:id="@+id/ivFotoPerfil"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                android:contentDescription="@string/desc_foto_perfil"
-                android:background="?attr/colorSurfaceVariant" />
+                android:contentDescription="@string/desc_foto_perfil" />
 
         </FrameLayout>
 
@@ -45,6 +45,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
+            android:backgroundTint="@color/green_500"
             android:text="@string/btn_tomar_fotografia" />
 
         <!-- Campos de formulario -->
@@ -116,12 +117,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
+                android:backgroundTint="@color/green_500"
                 android:text="@string/btn_salvar_contacto" />
 
             <Button
                 android:id="@+id/btnContactosSalvados"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:backgroundTint="@color/blue_500"
                 android:text="@string/btn_contactos_salvados" />
         </LinearLayout>
 
