@@ -12,10 +12,12 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.pm1e2p_grup1.R;
 import com.example.pm1e2p_grup1.presenter.MainPresenter;
+import com.example.pm1e2p_grup1.utils.PermissionHelper;
 import com.example.pm1e2p_grup1.view.interfaces.MainView;
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -28,17 +30,28 @@ public class MainActivity extends AppCompatActivity implements MainView {
     private Button btnTomarFoto, btnSalvarContacto, btnContactosSalvados;
     private ProgressBar progressBar;
     private double latitude = 0, longitude = 0;
+    private ActivityResultLauncher<String[]> permissionsLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Ocultar la barra de título si lo prefieres
+        // Ocultar la barra de título
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
 
         setContentView(R.layout.activity_contacto);
+
+        // Registrar launcher para permisos
+        permissionsLauncher = PermissionHelper.registerForPermissions(this, allGranted -> {
+            if (allGranted) {
+                // Inicializar todo lo que requiere permisos
+                initAfterPermissions();
+            } else {
+                showPermissionDialog();
+            }
+        });
 
         // Registrar el launcher para la cámara
         takePictureLauncher = registerForActivityResult(
@@ -52,6 +65,16 @@ public class MainActivity extends AppCompatActivity implements MainView {
         );
 
         // Inicializar vistas
+        initViews();
+
+        // Inicializar presentador
+        presenter = new MainPresenter(this, this);
+
+        // Verificar y solicitar permisos
+        checkAndRequestPermissions();
+    }
+
+    private void initViews() {
         etNombre = findViewById(R.id.etNombre);
         etTelefono = findViewById(R.id.etTelefono);
         etLatitud = findViewById(R.id.etLatitud);
@@ -60,45 +83,92 @@ public class MainActivity extends AppCompatActivity implements MainView {
         btnTomarFoto = findViewById(R.id.btnTomarFoto);
         btnSalvarContacto = findViewById(R.id.btnSalvarContacto);
         btnContactosSalvados = findViewById(R.id.btnContactosSalvados);
+    }
 
-        // Añade un ProgressBar a tu layout o asegúrate de crear uno programáticamente
-        // progressBar = findViewById(R.id.progressBar);
+    private void checkAndRequestPermissions() {
+        String[] requiredPermissions = PermissionHelper.getRequiredPermissions();
 
-        // Inicializar presentador
-        presenter = new MainPresenter(this, this);
+        if (!PermissionHelper.hasPermissions(this, requiredPermissions)) {
+            permissionsLauncher.launch(requiredPermissions);
+        } else {
+            initAfterPermissions();
+        }
+    }
 
+    private void initAfterPermissions() {
         // Configurar listeners
-        btnTomarFoto.setOnClickListener(v -> presenter.takePicture());
+        setupListeners();
 
-        btnSalvarContacto.setOnClickListener(v -> {
-            String name = etNombre.getText().toString();
-            String phone = etTelefono.getText().toString();
-
-            // Leer latitud y longitud desde los campos si no tienes detección automática
-            try {
-                if (!etLatitud.getText().toString().isEmpty()) {
-                    latitude = Double.parseDouble(etLatitud.getText().toString());
-                }
-                if (!etLongitud.getText().toString().isEmpty()) {
-                    longitude = Double.parseDouble(etLongitud.getText().toString());
-                }
-            } catch (NumberFormatException e) {
-                showError("Error en el formato de coordenadas");
-                return;
-            }
-
-            presenter.saveContact(name, phone, latitude, longitude, presenter.getCurrentPhotoPath());
-        });
-
-        btnContactosSalvados.setOnClickListener(v -> navigateToContactList());
-
-        // Obtener ubicación inicial
+        // Obtener ubicación
         presenter.getCurrentLocation();
     }
 
-    // Ya no necesitamos el método onActivityResult al usar ActivityResultLauncher
+    private void setupListeners() {
+        btnTomarFoto.setOnClickListener(v -> {
+            if (PermissionHelper.hasPermission(this, android.Manifest.permission.CAMERA)) {
+                presenter.takePicture();
+            } else {
+                showMessage("Se requiere permiso de cámara");
+            }
+        });
 
-    // Implementaciones de la interfaz MainView
+        btnSalvarContacto.setOnClickListener(v -> {
+            if (validateInputs()) {
+                String name = etNombre.getText().toString();
+                String phone = etTelefono.getText().toString();
+
+                try {
+                    double latitude = Double.parseDouble(etLatitud.getText().toString());
+                    double longitude = Double.parseDouble(etLongitud.getText().toString());
+
+                    presenter.saveContact(name, phone, latitude, longitude, presenter.getCurrentPhotoPath());
+                } catch (NumberFormatException e) {
+                    showError("Error en el formato de coordenadas");
+                }
+            }
+        });
+
+        btnContactosSalvados.setOnClickListener(v -> navigateToContactList());
+    }
+
+    private boolean validateInputs() {
+        if (etNombre.getText().toString().trim().isEmpty()) {
+            showError("El nombre es requerido");
+            return false;
+        }
+
+        if (etTelefono.getText().toString().trim().isEmpty()) {
+            showError("El teléfono es requerido");
+            return false;
+        }
+
+        if (etLatitud.getText().toString().trim().isEmpty() ||
+                etLongitud.getText().toString().trim().isEmpty()) {
+            showError("Se requieren coordenadas de ubicación");
+            return false;
+        }
+
+        if (presenter.getCurrentPhotoPath() == null) {
+            showError("Se requiere tomar una fotografía");
+            return false;
+        }
+
+        return true;
+    }
+
+    private void showPermissionDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("Permisos requeridos")
+                .setMessage("Esta aplicación necesita permisos para funcionar correctamente.")
+                .setPositiveButton("Configuración", (dialog, which) -> {
+                    Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                    intent.setData(Uri.parse("package:" + getPackageName()));
+                    startActivity(intent);
+                })
+                .setNegativeButton("Cancelar", (dialog, which) -> finish())
+                .setCancelable(false)
+                .show();
+    }
 
     @Override
     public void showMessage(String message) {
