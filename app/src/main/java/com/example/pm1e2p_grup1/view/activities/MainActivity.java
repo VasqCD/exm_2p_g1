@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.pm1e2p_grup1.R;
 import com.example.pm1e2p_grup1.presenter.MainPresenter;
+import com.example.pm1e2p_grup1.utils.LocationHelper;
 import com.example.pm1e2p_grup1.utils.PermissionHelper;
 import com.example.pm1e2p_grup1.view.interfaces.MainView;
 import com.google.android.material.textfield.TextInputEditText;
@@ -181,7 +182,33 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
     @Override
     public void showError(String error) {
-        Toast.makeText(this, error, Toast.LENGTH_LONG).show();
+        // Crear y mostrar una alerta en lugar de un Toast
+        new AlertDialog.Builder(this)
+                .setTitle("Error")
+                .setMessage(error)
+                .setPositiveButton("OK", null)
+                .show();
+    }
+
+    public void showGpsAlert() {
+        new AlertDialog.Builder(this)
+                .setTitle("Alerta")
+                .setMessage("GPS no está activo")
+                .setPositiveButton("OK", (dialog, which) -> {
+                    // Abrir configuración de ubicación
+                    Intent intent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    startActivity(intent);
+                })
+                .setNegativeButton("Cancelar", null)
+                .show();
+    }
+
+    public void showPhotoAlert() {
+        new AlertDialog.Builder(this)
+                .setTitle("Alerta")
+                .setMessage("No se ha tomado fotografía")
+                .setPositiveButton("OK", null)
+                .show();
     }
 
     @Override

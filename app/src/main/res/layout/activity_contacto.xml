@@ -14,16 +14,18 @@
         android:gravity="center_horizontal">
 
         <!-- Logo UTM -->
+
+        <!-- Contenedor de la foto de perfil -->
         <ImageView
             android:id="@+id/ivLogo"
             android:layout_width="120dp"
-            android:layout_height="wrap_content"
+            android:layout_height="47dp"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="16dp"
             android:contentDescription="@string/desc_logo_utm"
+            android:scaleType="centerCrop"
             android:src="@mipmap/logo_uth_foreground" />
 
-        <!-- Contenedor de la foto de perfil -->
         <FrameLayout
             android:layout_width="200dp"
             android:layout_height="200dp"
@@ -34,8 +36,8 @@
                 android:id="@+id/ivFotoPerfil"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                android:contentDescription="@string/desc_foto_perfil" />
+                android:contentDescription="@string/desc_foto_perfil"
+                android:scaleType="centerCrop" />
 
         </FrameLayout>
 

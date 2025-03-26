@@ -11,6 +11,7 @@ import com.example.pm1e2p_grup1.model.api.VolleyHandler;
 import com.example.pm1e2p_grup1.utils.ImageHelper;
 import com.example.pm1e2p_grup1.utils.LocationHelper;
 import com.example.pm1e2p_grup1.utils.PermissionHelper;
+import com.example.pm1e2p_grup1.view.activities.MainActivity;
 import com.example.pm1e2p_grup1.view.interfaces.MainView;
 
 import org.json.JSONException;
@@ -117,7 +118,8 @@ public class MainPresenter {
         }
 
         if (imagePath == null || imagePath.isEmpty()) {
-            view.showError("Se requiere tomar una fotografía");
+            // Mostrar alerta específica para la foto
+            ((MainActivity) view).showPhotoAlert();
             return false;
         }
 
@@ -138,6 +140,15 @@ public class MainPresenter {
         return true;
     }
 
+    public void checkGpsStatus() {
+        if (!LocationHelper.isGpsEnabled(context)) {
+            ((MainActivity) view).showGpsAlert();
+            return;
+        }
+        getCurrentLocation();
+    }
+
+
     public void takePicture() {
         try {
             if (!PermissionHelper.hasPermission(context, android.Manifest.permission.CAMERA)) {
@@ -151,16 +162,10 @@ public class MainPresenter {
                 currentPhotoPath = photoFile.getAbsolutePath();
                 view.launchCameraIntent(photoUri);
             } else {
-                view.showError("Error al crear URI para la foto");
+                ((MainActivity) view).showPhotoAlert();
             }
-        } catch (IllegalArgumentException e) {
-            view.showError("Error de configuración: " + e.getMessage());
-            e.printStackTrace();
-        } catch (IOException e) {
-            view.showError("Error al crear archivo: " + e.getMessage());
-            e.printStackTrace();
         } catch (Exception e) {
-            view.showError("Error inesperado: " + e.getMessage());
+            view.showError("Error al tomar fotografía: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -205,6 +210,8 @@ public class MainPresenter {
         byte[] byteArray = byteArrayOutputStream.toByteArray();
         return Base64.encodeToString(byteArray, Base64.DEFAULT);
     }
+
+
 
     public String getCurrentPhotoPath() {
         return currentPhotoPath;

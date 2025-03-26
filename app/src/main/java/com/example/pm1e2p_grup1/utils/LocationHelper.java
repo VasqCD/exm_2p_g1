@@ -3,6 +3,7 @@ package com.example.pm1e2p_grup1.utils;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Looper;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -27,13 +28,16 @@ public class LocationHelper {
 
     @SuppressLint("MissingPermission")
     public void getLastLocation(Consumer<Location> locationConsumer, Consumer<String> errorConsumer) {
-        // Usa el contexto guardado en lugar de intentar obtenerlo del fusedLocationClient
-        if (!PermissionHelper.hasPermission(context,
-                android.Manifest.permission.ACCESS_FINE_LOCATION) &&
-                !PermissionHelper.hasPermission(context,
-                        android.Manifest.permission.ACCESS_COARSE_LOCATION)) {
-
+        // Verificar permisos
+        if (!PermissionHelper.hasPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) &&
+                !PermissionHelper.hasPermission(context, android.Manifest.permission.ACCESS_COARSE_LOCATION)) {
             errorConsumer.accept("Permisos de ubicación no concedidos");
+            return;
+        }
+
+        // Verificar si el GPS está activo
+        if (!isGpsEnabled(context)) {
+            errorConsumer.accept("GPS_DISABLED");
             return;
         }
 
@@ -76,5 +80,10 @@ public class LocationHelper {
         if (locationCallback != null) {
             fusedLocationClient.removeLocationUpdates(locationCallback);
         }
+    }
+
+    public static boolean isGpsEnabled(Context context) {
+        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        return locationManager != null && locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
     }
 }
