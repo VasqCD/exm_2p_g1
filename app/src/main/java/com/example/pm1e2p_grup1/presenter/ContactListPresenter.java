@@ -72,29 +72,38 @@ public class ContactListPresenter {
     }
 
     public void getContactDetail(int contactId) {
-            view.showLoading();
+        view.showLoading();
 
-            String url = ApiMethods.ENDPOINT_CONTACT_BY_ID + contactId;
-            volleyHandler.getJsonObject(url,
-                    new VolleyHandler.VolleyCallback<JSONObject>() {
-                        @Override
-                        public void onSuccess(JSONObject result) {
-                            view.hideLoading();
-                            try {
-                                Contact contact = parseJsonToContact(result);
-                                // Aquí podrías navegar a la vista de detalle o actualizar UI
-                            } catch (JSONException e) {
-                                view.showError("Error al procesar los datos: " + e.getMessage());
+        String url = ApiMethods.ENDPOINT_CONTACT_BY_ID + contactId;
+        volleyHandler.getJsonObject(url,
+                new VolleyHandler.VolleyCallback<JSONObject>() {
+                    @Override
+                    public void onSuccess(JSONObject result) {
+                        view.hideLoading();
+                        try {
+                            // Comprobar si el resultado contiene un objeto "contacto"
+                            JSONObject contactObject;
+                            if (result.has("contacto")) {
+                                contactObject = result.getJSONObject("contacto");
+                            } else {
+                                // Si no tiene la clave "contacto", asumimos que el contacto está directamente en el objeto principal
+                                contactObject = result;
                             }
-                        }
 
-                        @Override
-                        public void onError(String error) {
-                            view.hideLoading();
-                            view.showError("Error al obtener detalles del contacto: " + error);
+                            Contact contact = parseJsonToContact(contactObject);
+                            // Aquí podrías navegar a la vista de detalle o actualizar UI
+                        } catch (JSONException e) {
+                            view.showError("Error al procesar los datos: " + e.getMessage());
                         }
-                    });
-        }
+                    }
+
+                    @Override
+                    public void onError(String error) {
+                        view.hideLoading();
+                        view.showError("Error al obtener detalles del contacto: " + error);
+                    }
+                });
+    }
 
     public void deleteContact(Contact contact) {
         view.showLoading();
