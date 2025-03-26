@@ -4,10 +4,10 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -28,7 +28,6 @@ public class MainActivity extends AppCompatActivity implements MainView {
     private TextInputEditText etNombre, etTelefono, etLatitud, etLongitud;
     private ImageView ivFotoPerfil;
     private Button btnTomarFoto, btnSalvarContacto, btnContactosSalvados;
-    private ProgressBar progressBar;
     private double latitude = 0, longitude = 0;
     private ActivityResultLauncher<String[]> permissionsLauncher;
 
@@ -75,14 +74,19 @@ public class MainActivity extends AppCompatActivity implements MainView {
     }
 
     private void initViews() {
-        etNombre = findViewById(R.id.etNombre);
-        etTelefono = findViewById(R.id.etTelefono);
-        etLatitud = findViewById(R.id.etLatitud);
-        etLongitud = findViewById(R.id.etLongitud);
-        ivFotoPerfil = findViewById(R.id.ivFotoPerfil);
-        btnTomarFoto = findViewById(R.id.btnTomarFoto);
-        btnSalvarContacto = findViewById(R.id.btnSalvarContacto);
-        btnContactosSalvados = findViewById(R.id.btnContactosSalvados);
+        try {
+            etNombre = findViewById(R.id.etNombre);
+            etTelefono = findViewById(R.id.etTelefono);
+            etLatitud = findViewById(R.id.etLatitud);
+            etLongitud = findViewById(R.id.etLongitud);
+            ivFotoPerfil = findViewById(R.id.ivFotoPerfil);
+            btnTomarFoto = findViewById(R.id.btnTomarFoto);
+            btnSalvarContacto = findViewById(R.id.btnSalvarContacto);
+            btnContactosSalvados = findViewById(R.id.btnContactosSalvados);
+
+        } catch (Exception e) {
+            logError("initViews", e);
+        }
     }
 
     private void checkAndRequestPermissions() {
@@ -210,21 +214,23 @@ public class MainActivity extends AppCompatActivity implements MainView {
     }
 
     @Override
+    public void launchCameraIntent(Uri photoUri) {
+        takePictureLauncher.launch(photoUri);
+    }
+
+    @Override
     public void showLoading() {
-        if (progressBar != null) {
-            progressBar.setVisibility(View.VISIBLE);
-        }
+
     }
 
     @Override
     public void hideLoading() {
-        if (progressBar != null) {
-            progressBar.setVisibility(View.GONE);
-        }
+
     }
 
-    @Override
-    public void launchCameraIntent(Uri photoUri) {
-        takePictureLauncher.launch(photoUri);
+    private void logError(String method, Exception e) {
+        String errorMsg = "Error en " + method + ": " + e.getMessage();
+        Log.e("MainActivity", errorMsg, e);
+        showError(errorMsg);
     }
 }

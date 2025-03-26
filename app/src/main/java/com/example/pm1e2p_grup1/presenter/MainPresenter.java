@@ -44,22 +44,22 @@ public class MainPresenter {
         view.showLoading();
 
         try {
-            // URL del endpoint
-            String url = "http://localhost/CRUDPHP/POSTContacto.php";
+            // URL del endpoint actualizada
+            String url = ApiMethods.ENDPOINT_CREATE_CONTACT;
 
             // Preparar datos para enviar
             Map<String, String> params = new HashMap<>();
-            params.put("name", name);
-            params.put("phone", phone);
-            params.put("latitude", String.valueOf(latitude));
-            params.put("longitude", String.valueOf(longitude));
+            params.put("nombre", name);
+            params.put("telefono", phone);
+            params.put("latitud", String.valueOf(latitude));
+            params.put("longitud", String.valueOf(longitude));
 
             // Convertir imagen a Base64 si existe
             if (imagePath != null && !imagePath.isEmpty()) {
                 Bitmap bitmap = ImageHelper.loadImageFromPath(imagePath);
                 if (bitmap != null) {
                     String base64Image = convertBitmapToBase64(bitmap);
-                    params.put("photo", base64Image);
+                    params.put("foto", base64Image);
                 } else {
                     view.hideLoading();
                     view.showError("Error al procesar la imagen");
@@ -141,12 +141,28 @@ public class MainPresenter {
 
     public void takePicture() {
         try {
+            if (!PermissionHelper.hasPermission(context, android.Manifest.permission.CAMERA)) {
+                view.showError("Se requiere permiso de cámara");
+                return;
+            }
+
             File photoFile = ImageHelper.createImageFile(context);
             Uri photoUri = ImageHelper.getUriForFile(context, photoFile);
-            currentPhotoPath = photoFile.getAbsolutePath();
-            view.launchCameraIntent(photoUri);  // Cambiado de startCameraIntent a launchCameraIntent
+            if (photoUri != null) {
+                currentPhotoPath = photoFile.getAbsolutePath();
+                view.launchCameraIntent(photoUri);
+            } else {
+                view.showError("Error al crear URI para la foto");
+            }
+        } catch (IllegalArgumentException e) {
+            view.showError("Error de configuración: " + e.getMessage());
+            e.printStackTrace();
         } catch (IOException e) {
-            view.showError("Error al crear archivo para la foto: " + e.getMessage());
+            view.showError("Error al crear archivo: " + e.getMessage());
+            e.printStackTrace();
+        } catch (Exception e) {
+            view.showError("Error inesperado: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
