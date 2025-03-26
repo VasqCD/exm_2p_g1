@@ -28,19 +28,23 @@ public class ContactListPresenter {
         this.volleyHandler = VolleyHandler.getInstance(context);
     }
 
+
     public void loadContacts() {
         view.showLoading();
 
-        volleyHandler.getJsonArray(ApiMethods.ENDPOINT_CONTACTS,
-                new VolleyHandler.VolleyCallback<JSONArray>() {
+        volleyHandler.getJsonObject(ApiMethods.ENDPOINT_CONTACTS,
+                new VolleyHandler.VolleyCallback<JSONObject>() {
                     @Override
-                    public void onSuccess(JSONArray result) {
+                    public void onSuccess(JSONObject result) {
                         List<Contact> contacts = new ArrayList<>();
 
                         try {
-                            // Adaptando para la estructura de la API
-                            for (int i = 0; i < result.length(); i++) {
-                                JSONObject jsonObject = result.getJSONObject(i);
+                            // Obtener el array de contactos dentro del objeto JSON
+                            JSONArray contactsArray = result.getJSONArray("contactos");
+
+                            // Procesar cada contacto en el array
+                            for (int i = 0; i < contactsArray.length(); i++) {
+                                JSONObject jsonObject = contactsArray.getJSONObject(i);
                                 Contact contact = parseJsonToContact(jsonObject);
                                 contacts.add(contact);
                             }
@@ -61,13 +65,13 @@ public class ContactListPresenter {
 
                     @Override
                     public void onError(String error) {
-                            view.hideLoading();
-                            view.showError("Error al cargar los contactos: " + error);
-                        }
-                    });
-                }
+                        view.hideLoading();
+                        view.showError("Error al cargar los contactos: " + error);
+                    }
+                });
+    }
 
-        public void getContactDetail(int contactId) {
+    public void getContactDetail(int contactId) {
             view.showLoading();
 
             String url = ApiMethods.ENDPOINT_CONTACT_BY_ID + contactId;
@@ -92,45 +96,45 @@ public class ContactListPresenter {
                     });
         }
 
-        public void deleteContact(Contact contact) {
-            view.showLoading();
+    public void deleteContact(Contact contact) {
+        view.showLoading();
 
-            try {
-                // Crear JSON para enviar el ID a eliminar
-                JSONObject jsonRequest = new JSONObject();
-                jsonRequest.put("id", contact.getId());
+        try {
+            // Crear JSON para enviar el ID a eliminar
+            JSONObject jsonRequest = new JSONObject();
+            jsonRequest.put("id", contact.getId());
 
-                volleyHandler.postJsonObject(ApiMethods.ENDPOINT_DELETE_CONTACT, jsonRequest,
-                        new VolleyHandler.VolleyCallback<JSONObject>() {
-                            @Override
-                            public void onSuccess(JSONObject result) {
-                                view.hideLoading();
-                                try {
-                                    boolean success = result.getBoolean("success");
-                                    String message = result.getString("message");
+            volleyHandler.postJsonObject(ApiMethods.ENDPOINT_DELETE_CONTACT, jsonRequest,
+                    new VolleyHandler.VolleyCallback<JSONObject>() {
+                        @Override
+                        public void onSuccess(JSONObject result) {
+                            view.hideLoading();
+                            try {
+                                boolean success = result.getBoolean("success");
+                                String message = result.getString("message");
 
-                                    if (success) {
-                                        view.onContactDeleted(contact);
-                                        view.showMessage(message);
-                                    } else {
-                                        view.showError(message);
-                                    }
-                                } catch (JSONException e) {
-                                    view.showError("Error al procesar la respuesta: " + e.getMessage());
+                                if (success) {
+                                    view.onContactDeleted(contact);
+                                    view.showMessage(message);
+                                } else {
+                                    view.showError(message);
                                 }
+                            } catch (JSONException e) {
+                                view.showError("Error al procesar la respuesta: " + e.getMessage());
                             }
+                        }
 
-                            @Override
-                            public void onError(String error) {
-                                view.hideLoading();
-                                view.showError("Error al eliminar el contacto: " + error);
-                            }
-                        });
-            } catch (JSONException e) {
-                view.hideLoading();
-                view.showError("Error al crear la solicitud: " + e.getMessage());
-            }
+                        @Override
+                        public void onError(String error) {
+                            view.hideLoading();
+                            view.showError("Error al eliminar el contacto: " + error);
+                        }
+                    });
+        } catch (JSONException e) {
+            view.hideLoading();
+            view.showError("Error al crear la solicitud: " + e.getMessage());
         }
+    }
 
         // Parsear respuesta JSON a objeto Contact (adaptado a la estructura de la API)
         private Contact parseJsonToContact(JSONObject json) throws JSONException {

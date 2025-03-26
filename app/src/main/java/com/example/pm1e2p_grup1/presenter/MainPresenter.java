@@ -47,19 +47,19 @@ public class MainPresenter {
             // URL del endpoint actualizada
             String url = ApiMethods.ENDPOINT_CREATE_CONTACT;
 
-            // Preparar datos para enviar
-            Map<String, String> params = new HashMap<>();
-            params.put("nombre", name);
-            params.put("telefono", phone);
-            params.put("latitud", String.valueOf(latitude));
-            params.put("longitud", String.valueOf(longitude));
+            // Crear JSON con los parámetros correctos
+            JSONObject jsonRequest = new JSONObject();
+            jsonRequest.put("nombre", name);
+            jsonRequest.put("telefono", phone);
+            jsonRequest.put("latitud", latitude);
+            jsonRequest.put("longitud", longitude);
 
             // Convertir imagen a Base64 si existe
             if (imagePath != null && !imagePath.isEmpty()) {
                 Bitmap bitmap = ImageHelper.loadImageFromPath(imagePath);
                 if (bitmap != null) {
                     String base64Image = convertBitmapToBase64(bitmap);
-                    params.put("foto", base64Image);
+                    jsonRequest.put("foto", base64Image);
                 } else {
                     view.hideLoading();
                     view.showError("Error al procesar la imagen");
@@ -72,15 +72,14 @@ public class MainPresenter {
             }
 
             // Enviar petición a la API
-            volleyHandler.postFormData(url, params,
-                    new VolleyHandler.VolleyCallback<String>() {
+            volleyHandler.postJsonObject(url, jsonRequest,
+                    new VolleyHandler.VolleyCallback<JSONObject>() {
                         @Override
-                        public void onSuccess(String result) {
+                        public void onSuccess(JSONObject result) {
                             view.hideLoading();
                             try {
-                                JSONObject response = new JSONObject(result);
-                                boolean success = response.getBoolean("success");
-                                String message = response.getString("message");
+                                boolean success = result.getBoolean("success");
+                                String message = result.getString("message");
 
                                 if (success) {
                                     view.showMessage(message);

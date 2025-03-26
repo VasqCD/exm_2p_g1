@@ -8,7 +8,7 @@ public class ApiMethods {
     // Endpoints específicos
     public static final String ENDPOINT_CONTACTS = BASE_URL + "read.php"; // Todos los contactos
     public static final String ENDPOINT_CONTACT_BY_ID = BASE_URL + "read_one.php?id="; // Contacto por ID
-    public static final String ENDPOINT_CREATE_CONTACT = BASE_URL + "create_form.php"; // Crear contacto
+    public static final String ENDPOINT_CREATE_CONTACT = BASE_URL + "create.php"; // Crear contacto
     public static final String ENDPOINT_UPDATE_CONTACT = BASE_URL + "update.php"; // Actualizar contacto
     public static final String ENDPOINT_DELETE_CONTACT = BASE_URL + "delete.php"; // Eliminar contacto
 
