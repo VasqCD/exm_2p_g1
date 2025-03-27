@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import android.graphics.Matrix;
 
 public class ImageHelper {
 
@@ -63,7 +64,6 @@ public class ImageHelper {
         }
     }
 
-    // Método de copia de archivos compatible con API 24
     private static void copyFile(File sourceFile, File destFile) throws IOException {
         if (!destFile.exists()) {
             destFile.createNewFile();
@@ -94,6 +94,76 @@ public class ImageHelper {
                     // Ignorar
                 }
             }
+        }
+    }
+
+    public static Bitmap loadImageFromPathWithOrientation(String path) {
+        if (path == null || path.isEmpty()) {
+            return null;
+        }
+
+        try {
+            // Cargar la imagen en un bitmap
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(path, options);
+
+            int photoW = options.outWidth;
+            int photoH = options.outHeight;
+
+            // Determinar cuánto reducir el tamaño de la imagen
+            int targetW = 500;
+            int targetH = 500;
+            int scaleFactor = Math.max(1, Math.min(photoW / targetW, photoH / targetH));
+
+            // Decodificar el archivo de imagen en un Bitmap de tamaño reducido
+            options.inJustDecodeBounds = false;
+            options.inSampleSize = scaleFactor;
+
+            Bitmap bitmap = BitmapFactory.decodeFile(path, options);
+
+            if (bitmap == null) {
+                return null;
+            }
+
+            // Corregir la orientación
+            try {
+                android.media.ExifInterface exif = new android.media.ExifInterface(path);
+                int orientation = exif.getAttributeInt(
+                        android.media.ExifInterface.TAG_ORIENTATION,
+                        android.media.ExifInterface.ORIENTATION_UNDEFINED);
+
+                Matrix matrix = new Matrix();
+                switch (orientation) {
+                    case android.media.ExifInterface.ORIENTATION_ROTATE_90:
+                        matrix.postRotate(90);
+                        break;
+                    case android.media.ExifInterface.ORIENTATION_ROTATE_180:
+                        matrix.postRotate(180);
+                        break;
+                    case android.media.ExifInterface.ORIENTATION_ROTATE_270:
+                        matrix.postRotate(270);
+                        break;
+                    case android.media.ExifInterface.ORIENTATION_FLIP_HORIZONTAL:
+                        matrix.preScale(-1.0f, 1.0f);
+                        break;
+                    case android.media.ExifInterface.ORIENTATION_FLIP_VERTICAL:
+                        matrix.preScale(1.0f, -1.0f);
+                        break;
+                    default:
+                        // No es necesario aplicar rotación
+                        return bitmap;
+                }
+
+                // Aplicar la transformación
+                return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+            } catch (Exception e) {
+                Log.e("ImageHelper", "Error corrigiendo orientación: " + e.getMessage());
+                return bitmap; // Devolver el bitmap sin corregir si hay error
+            }
+        } catch (Exception e) {
+            Log.e("ImageHelper", "Error cargando imagen: " + e.getMessage());
+            return null;
         }
     }
 

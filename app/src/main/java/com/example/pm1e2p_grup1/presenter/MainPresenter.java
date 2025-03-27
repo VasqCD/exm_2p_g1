@@ -114,7 +114,7 @@ public class MainPresenter {
         view.showLoading();
 
         try {
-            // URL del endpoint de actualización
+            // actualizacion
             String url = ApiMethods.ENDPOINT_UPDATE_CONTACT;
 
             // Crear JSON con los parámetros correctos
@@ -134,7 +134,7 @@ public class MainPresenter {
                 }
             }
 
-            // Enviar petición a la API
+            // enviar peticion a la API
             volleyHandler.postJsonObject(url, jsonRequest,
                     new VolleyHandler.VolleyCallback<JSONObject>() {
                         @Override
@@ -180,7 +180,6 @@ public class MainPresenter {
         }
 
         if (imagePath == null || imagePath.isEmpty()) {
-            // Mostrar alerta específica para la foto
             ((MainActivity) view).showPhotoAlert();
             return false;
         }
@@ -234,7 +233,7 @@ public class MainPresenter {
 
     public void processPhoto() {
         if (currentPhotoPath != null) {
-            Bitmap photo = ImageHelper.loadImageFromPath(currentPhotoPath);
+            Bitmap photo = ImageHelper.loadImageFromPathWithOrientation(currentPhotoPath);
             if (photo != null) {
                 view.displayImage(photo);
             } else {
@@ -263,7 +262,6 @@ public class MainPresenter {
         );
     }
 
-    // Método auxiliar para convertir Bitmap a Base64
     private String convertBitmapToBase64(Bitmap bitmap) {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 70, byteArrayOutputStream);
