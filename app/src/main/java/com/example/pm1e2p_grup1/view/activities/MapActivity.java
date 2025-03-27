@@ -32,7 +32,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
 
-        // Configurar barra de título
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle("Ubicación de Contacto");
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -75,7 +74,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     private void initMap() {
-        // Obtener el fragmento del mapa y solicitar el mapa asincrónicamente
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.mapFragment);
         if (mapFragment != null) {
@@ -89,8 +87,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private void openInGoogleMaps() {
         try {
-            // Crear una URI para abrir Google Maps en las coordenadas específicas
-            Uri gmmIntentUri = Uri.parse("geo:" + latitude + "," + longitude + "?q=" + latitude + "," + longitude + "(" + contactName + ")");
+            Uri gmmIntentUri = Uri.parse("google.navigation:q=" + latitude + "," + longitude + "&mode=d");
             Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
             mapIntent.setPackage("com.google.android.apps.maps");
 
@@ -98,8 +95,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             if (mapIntent.resolveActivity(getPackageManager()) != null) {
                 startActivity(mapIntent);
             } else {
-                // Si Google Maps no está instalado, abrir en el navegador
-                Uri browserUri = Uri.parse("https://www.google.com/maps/search/?api=1&query=" + latitude + "," + longitude);
+                Uri browserUri = Uri.parse("https://www.google.com/maps/dir/?api=1&destination=" + latitude + "," + longitude + "&travelmode=driving");
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, browserUri);
                 startActivity(browserIntent);
             }
@@ -117,19 +113,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
-
-        // Crear un objeto LatLng con las coordenadas del contacto
         LatLng contactLocation = new LatLng(latitude, longitude);
 
-        // Añadir un marcador en la ubicación del contacto
         googleMap.addMarker(new MarkerOptions()
                 .position(contactLocation)
                 .title(contactName));
 
-        // Mover la cámara a la ubicación del contacto con un zoom adecuado
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(contactLocation, 15f));
 
-        // Habilitar controles del mapa
         try {
             googleMap.setMyLocationEnabled(true);
         } catch (SecurityException e) {
