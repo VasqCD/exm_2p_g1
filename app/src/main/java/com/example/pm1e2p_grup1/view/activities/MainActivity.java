@@ -2,8 +2,12 @@ package com.example.pm1e2p_grup1.view.activities;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -12,16 +16,27 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.example.pm1e2p_grup1.R;
 import com.example.pm1e2p_grup1.presenter.MainPresenter;
 import com.example.pm1e2p_grup1.utils.Constants;
+import com.example.pm1e2p_grup1.utils.ImageHelper;
 import com.example.pm1e2p_grup1.utils.LocationHelper;
 import com.example.pm1e2p_grup1.utils.PermissionHelper;
 import com.example.pm1e2p_grup1.view.interfaces.MainView;
 import com.google.android.material.textfield.TextInputEditText;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity implements MainView {
 
@@ -110,14 +125,88 @@ public class MainActivity extends AppCompatActivity implements MainView {
                 latitude = intent.getDoubleExtra(Constants.EXTRA_LATITUDE, 0);
                 longitude = intent.getDoubleExtra(Constants.EXTRA_LONGITUDE, 0);
 
+                // AÑADIR ESTO: Obtener URL de la foto si existe
+                String photoUrl = intent.getStringExtra(Constants.EXTRA_PHOTO_URL);
+
                 // Actualizar UI
                 etNombre.setText(name);
                 etTelefono.setText(phone);
                 etLatitud.setText(String.valueOf(latitude));
                 etLongitud.setText(String.valueOf(longitude));
 
+                // AÑADIR ESTO: Cargar la foto si existe URL
+                if (photoUrl != null && !photoUrl.isEmpty()) {
+                    cargarImagenDesdeUrl(photoUrl);
+                }
+
                 // Cambiar texto del botón
                 btnSalvarContacto.setText("Actualizar Contacto");
+            }
+        }
+    }
+
+    // AÑADIR ESTE MÉTODO para cargar la imagen desde la URL
+    private void cargarImagenDesdeUrl(String photoUrl) {
+        if (photoUrl != null && !photoUrl.isEmpty()) {
+            showLoading();
+
+            if (photoUrl.startsWith("http")) {
+                // Si es una URL web, usar Glide
+                Glide.with(this)
+                        .load(photoUrl)
+                        .listener(new RequestListener<Drawable>() {
+                            @Override
+                            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                                hideLoading();
+                                return false;
+                            }
+
+                            @Override
+                            public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                                hideLoading();
+                                if (resource instanceof BitmapDrawable) {
+                                    Bitmap bitmap = ((BitmapDrawable) resource).getBitmap();
+                                    ivFotoPerfil.setImageBitmap(bitmap);
+
+                                    // Guardar la imagen localmente
+                                    try {
+                                        File photoFile = ImageHelper.createImageFile(MainActivity.this);
+                                        FileOutputStream fos = new FileOutputStream(photoFile);
+                                        bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fos);
+                                        fos.close();
+
+                                        // Actualizar la ruta de la foto
+                                        presenter.setCurrentPhotoPath(photoFile.getAbsolutePath());
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                        showError("Error al guardar la imagen: " + e.getMessage());
+                                    }
+                                }
+                                return false;
+                            }
+                        })
+                        .into(ivFotoPerfil);
+            } else if (photoUrl.length() > 100) {
+                // Podría ser una imagen en base64
+                try {
+                    byte[] decodedString = Base64.decode(photoUrl, Base64.DEFAULT);
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                    ivFotoPerfil.setImageBitmap(bitmap);
+
+                    // Guardar la imagen localmente igual que arriba
+                    File photoFile = ImageHelper.createImageFile(MainActivity.this);
+                    FileOutputStream fos = new FileOutputStream(photoFile);
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fos);
+                    fos.close();
+                    presenter.setCurrentPhotoPath(photoFile.getAbsolutePath());
+
+                    hideLoading();
+                } catch (Exception e) {
+                    hideLoading();
+                    showError("Error al decodificar la imagen: " + e.getMessage());
+                }
+            } else {
+                hideLoading();
             }
         }
     }

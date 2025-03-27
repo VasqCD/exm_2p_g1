@@ -120,12 +120,10 @@ public class ContactListActivity extends AppCompatActivity implements ContactLis
         });
     }
 
-    // Método para habilitar/deshabilitar botones
     private void setButtonsEnabled(boolean enabled) {
         btnDeleteContact.setEnabled(enabled);
         btnUpdateContact.setEnabled(enabled);
 
-        // Opcional: cambiar opacidad para indicar visualmente el estado
         float alpha = enabled ? 1.0f : 0.5f;
         btnDeleteContact.setAlpha(alpha);
         btnUpdateContact.setAlpha(alpha);
@@ -219,7 +217,8 @@ public class ContactListActivity extends AppCompatActivity implements ContactLis
         intent.putExtra(Constants.EXTRA_PHONE, contact.getPhone());
         intent.putExtra(Constants.EXTRA_LATITUDE, contact.getLatitude());
         intent.putExtra(Constants.EXTRA_LONGITUDE, contact.getLongitude());
-        // Nota: no podemos pasar la foto directamente, pero se obtendrá del servidor
+        intent.putExtra(Constants.EXTRA_PHOTO_URL, contact.getPhotoUrl());
+
         startActivityForResult(intent, Constants.REQUEST_UPDATE_CONTACT);
     }
 

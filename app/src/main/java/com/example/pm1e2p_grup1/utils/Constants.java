@@ -18,4 +18,5 @@ public class Constants {
     // Modos de operación
     public static final String MODE_UPDATE = "update";
     public static final String MODE_CREATE = "create";
+    public static final String EXTRA_PHOTO_URL = "photo_url";
 }
