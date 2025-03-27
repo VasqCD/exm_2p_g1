@@ -6,35 +6,16 @@
     android:layout_height="match_parent"
     tools:context=".view.activities.MapActivity">
 
-    <!-- Vista del mapa que ocupará toda la pantalla -->
-    <FrameLayout
-        android:id="@+id/mapContainer"
+    <!-- Fragment de Google Maps -->
+    <fragment
+        android:id="@+id/mapFragment"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <!-- Aquí usaremos una imagen para simular el mapa, pero en una implementación real
-             se usaría Google Maps o alguna otra biblioteca de mapas -->
-        <ImageView
-            android:id="@+id/mapImageView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            android:contentDescription="@string/map_description"
-            android:background="@drawable/map_background"/>
-
-        <!-- Marcador de posición en el mapa -->
-        <ImageView
-            android:id="@+id/markerImageView"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_gravity="center"
-            android:contentDescription="@string/marker_description"
-            android:src="@drawable/ic_location_marker"/>
-    </FrameLayout>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <!-- Información del contacto en la parte superior -->
     <LinearLayout

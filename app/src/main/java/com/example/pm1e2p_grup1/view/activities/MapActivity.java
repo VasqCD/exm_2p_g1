@@ -3,8 +3,6 @@ package com.example.pm1e2p_grup1.view.activities;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -12,13 +10,19 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.pm1e2p_grup1.R;
 import com.example.pm1e2p_grup1.utils.Constants;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-public class MapActivity extends AppCompatActivity {
+public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private TextView txtContactName, txtCoordinates;
     private FloatingActionButton fabOpenMaps;
-    private ImageView mapImageView, markerImageView;
+    private GoogleMap googleMap;
 
     private String contactName;
     private double latitude, longitude;
@@ -43,6 +47,9 @@ public class MapActivity extends AppCompatActivity {
         // Configurar vistas con los datos
         setupViews();
 
+        // Inicializar mapa
+        initMap();
+
         // Configurar listeners
         setupListeners();
     }
@@ -51,8 +58,6 @@ public class MapActivity extends AppCompatActivity {
         txtContactName = findViewById(R.id.txtContactName);
         txtCoordinates = findViewById(R.id.txtCoordinates);
         fabOpenMaps = findViewById(R.id.fabOpenMaps);
-        mapImageView = findViewById(R.id.mapImageView);
-        markerImageView = findViewById(R.id.markerImageView);
     }
 
     private void getIntentData() {
@@ -67,12 +72,15 @@ public class MapActivity extends AppCompatActivity {
     private void setupViews() {
         txtContactName.setText(contactName);
         txtCoordinates.setText(String.format("Lat: %s, Long: %s", latitude, longitude));
+    }
 
-        // Establecer fondo de mapa simulado
-        mapImageView.setBackgroundResource(R.drawable.map_background);
-
-        // Mostrar marcador
-        markerImageView.setVisibility(View.VISIBLE);
+    private void initMap() {
+        // Obtener el fragmento del mapa y solicitar el mapa asincrónicamente
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.mapFragment);
+        if (mapFragment != null) {
+            mapFragment.getMapAsync(this);
+        }
     }
 
     private void setupListeners() {
@@ -104,5 +112,31 @@ public class MapActivity extends AppCompatActivity {
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        this.googleMap = googleMap;
+
+        // Crear un objeto LatLng con las coordenadas del contacto
+        LatLng contactLocation = new LatLng(latitude, longitude);
+
+        // Añadir un marcador en la ubicación del contacto
+        googleMap.addMarker(new MarkerOptions()
+                .position(contactLocation)
+                .title(contactName));
+
+        // Mover la cámara a la ubicación del contacto con un zoom adecuado
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(contactLocation, 15f));
+
+        // Habilitar controles del mapa
+        try {
+            googleMap.setMyLocationEnabled(true);
+        } catch (SecurityException e) {
+            // Manejar la excepción si no se tienen los permisos
+            Toast.makeText(this, "Se requieren permisos de ubicación para mostrar tu ubicación actual", Toast.LENGTH_SHORT).show();
+        }
+        googleMap.getUiSettings().setZoomControlsEnabled(true);
+        googleMap.getUiSettings().setCompassEnabled(true);
     }
 }
