@@ -11,4 +11,18 @@
     <string name="btn_salvar_contacto">Salvar Contacto</string>
     <string name="btn_contactos_salvados">Contactos Salvados</string>
     <string name="no_contacts">No hay contactos para mostrar</string>
+
+    <!-- Nuevos strings -->
+    <string name="search_hint">Buscar contacto</string>
+    <string name="delete_contact">Eliminar Contacto</string>
+    <string name="update_contact">Actualizar Contacto</string>
+    <string name="confirm_delete">¿Confirma que desea eliminar este contacto?</string>
+    <string name="yes">Sí</string>
+    <string name="no">No</string>
+    <string name="view_location">Ver Ubicación</string>
+    <string name="map_description">Mapa de ubicación</string>
+    <string name="marker_description">Marcador de ubicación</string>
+    <string name="open_maps">Abrir en Google Maps</string>
+    <string name="location_message">¿Desea ir a la ubicación de %s?</string>
+    <string name="contact_action">Acción</string>
 </resources>

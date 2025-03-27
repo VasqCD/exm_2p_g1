@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Fondo base -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#F0F0F0" />
+        </shape>
+    </item>
+
+    <!-- Líneas horizontales simulando calles -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#E8E8E8" />
+            <size android:height="1dp" />
+        </shape>
+    </item>
+
+    <!-- Líneas verticales simulando calles -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#E8E8E8" />
+            <size android:width="1dp" />
+        </shape>
+    </item>
+
+    <!-- Calle principal horizontal -->
+    <item android:top="150dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#DCDCDC" />
+            <size android:height="20dp" />
+        </shape>
+    </item>
+
+    <!-- Calle principal vertical -->
+    <item android:left="200dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#DCDCDC" />
+            <size android:width="20dp" />
+        </shape>
+    </item>
+
+    <!-- Área verde -->
+    <item android:left="50dp" android:top="200dp" android:right="250dp" android:bottom="100dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#C8E6C9" />
+        </shape>
+    </item>
+</layer-list>

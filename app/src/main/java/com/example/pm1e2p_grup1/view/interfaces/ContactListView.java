@@ -12,4 +12,8 @@ public interface ContactListView {
     void showError(String message);
     void showMessage(String message);
     void onContactDeleted(Contact contact);
+    void onContactSelected(Contact contact);
+    void filterContacts(String query);
+    void navigateToUpdateContact(Contact contact);
+    void navigateToMapView(Contact contact);
 }

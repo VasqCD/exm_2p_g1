@@ -1,4 +1,3 @@
-
 package com.example.pm1e2p_grup1.presenter;
 
 import android.content.Context;
@@ -22,12 +21,13 @@ public class ContactListPresenter {
     private static final String TAG = "ContactListPresenter";
     private final ContactListView view;
     private final VolleyHandler volleyHandler;
+    private List<Contact> allContacts;  // Lista completa para filtrado
 
     public ContactListPresenter(ContactListView view, Context context) {
         this.view = view;
         this.volleyHandler = VolleyHandler.getInstance(context);
+        this.allContacts = new ArrayList<>();
     }
-
 
     public void loadContacts() {
         view.showLoading();
@@ -48,6 +48,10 @@ public class ContactListPresenter {
                                 Contact contact = parseJsonToContact(jsonObject);
                                 contacts.add(contact);
                             }
+
+                            // Guardar todos los contactos para filtrado
+                            allContacts.clear();
+                            allContacts.addAll(contacts);
 
                             view.hideLoading();
 
@@ -91,7 +95,7 @@ public class ContactListPresenter {
                             }
 
                             Contact contact = parseJsonToContact(contactObject);
-                            // Aquí podrías navegar a la vista de detalle o actualizar UI
+                            view.onContactSelected(contact);
                         } catch (JSONException e) {
                             view.showError("Error al procesar los datos: " + e.getMessage());
                         }
@@ -123,6 +127,9 @@ public class ContactListPresenter {
                                 String message = result.getString("message");
 
                                 if (success) {
+                                    // Eliminar de la lista local
+                                    allContacts.remove(contact);
+
                                     view.onContactDeleted(contact);
                                     view.showMessage(message);
                                 } else {
@@ -145,27 +152,60 @@ public class ContactListPresenter {
         }
     }
 
-        // Parsear respuesta JSON a objeto Contact (adaptado a la estructura de la API)
-        private Contact parseJsonToContact(JSONObject json) throws JSONException {
-            Contact contact = new Contact();
-            contact.setId(json.getInt("id"));
-            contact.setName(json.getString("nombre"));
-            contact.setPhone(json.getString("telefono"));
-            contact.setLatitude(json.getDouble("latitud"));
-            contact.setLongitude(json.getDouble("longitud"));
+    public void filterContacts(String query) {
+        if (query == null || query.isEmpty()) {
+            // Si la consulta está vacía, mostrar todos los contactos
+            view.showContacts(allContacts);
+            return;
+        }
 
-            if (json.has("foto") && !json.isNull("foto")) {
-                contact.setPhotoUrl(json.getString("foto"));
+        // Filtrar contactos basados en la consulta
+        List<Contact> filteredContacts = new ArrayList<>();
+        String queryLowerCase = query.toLowerCase();
+
+        for (Contact contact : allContacts) {
+            if (contact.getName().toLowerCase().contains(queryLowerCase) ||
+                    contact.getPhone().toLowerCase().contains(queryLowerCase)) {
+                filteredContacts.add(contact);
             }
+        }
 
-            if (json.has("created_at") && !json.isNull("created_at")) {
-                contact.setCreatedAt(json.getString("created_at"));
-            }
-
-            if (json.has("updated_at") && !json.isNull("updated_at")) {
-                contact.setUpdatedAt(json.getString("updated_at"));
-            }
-
-            return contact;
+        if (filteredContacts.isEmpty()) {
+            view.showEmptyView();
+        } else {
+            view.showContacts(filteredContacts);
         }
     }
+
+    public void selectContactForEdit(Contact contact) {
+        view.navigateToUpdateContact(contact);
+    }
+
+    public void selectContactForMap(Contact contact) {
+        view.navigateToMapView(contact);
+    }
+
+    // Parsear respuesta JSON a objeto Contact (adaptado a la estructura de la API)
+    private Contact parseJsonToContact(JSONObject json) throws JSONException {
+        Contact contact = new Contact();
+        contact.setId(json.getInt("id"));
+        contact.setName(json.getString("nombre"));
+        contact.setPhone(json.getString("telefono"));
+        contact.setLatitude(json.getDouble("latitud"));
+        contact.setLongitude(json.getDouble("longitud"));
+
+        if (json.has("foto") && !json.isNull("foto")) {
+            contact.setPhotoUrl(json.getString("foto"));
+        }
+
+        if (json.has("created_at") && !json.isNull("created_at")) {
+            contact.setCreatedAt(json.getString("created_at"));
+        }
+
+        if (json.has("updated_at") && !json.isNull("updated_at")) {
+            contact.setUpdatedAt(json.getString("updated_at"));
+        }
+
+        return contact;
+    }
+}

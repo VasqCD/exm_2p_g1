@@ -106,6 +106,68 @@ public class MainPresenter {
         }
     }
 
+    public void updateContact(int contactId, String name, String phone, double latitude, double longitude, String imagePath) {
+        if (!validateInput(name, phone)) {
+            return;
+        }
+
+        view.showLoading();
+
+        try {
+            // URL del endpoint de actualización
+            String url = ApiMethods.ENDPOINT_UPDATE_CONTACT;
+
+            // Crear JSON con los parámetros correctos
+            JSONObject jsonRequest = new JSONObject();
+            jsonRequest.put("id", contactId);
+            jsonRequest.put("nombre", name);
+            jsonRequest.put("telefono", phone);
+            jsonRequest.put("latitud", latitude);
+            jsonRequest.put("longitud", longitude);
+
+            // Añadir foto solo si hay una nueva
+            if (imagePath != null && !imagePath.isEmpty()) {
+                Bitmap bitmap = ImageHelper.loadImageFromPath(imagePath);
+                if (bitmap != null) {
+                    String base64Image = convertBitmapToBase64(bitmap);
+                    jsonRequest.put("foto", base64Image);
+                }
+            }
+
+            // Enviar petición a la API
+            volleyHandler.postJsonObject(url, jsonRequest,
+                    new VolleyHandler.VolleyCallback<JSONObject>() {
+                        @Override
+                        public void onSuccess(JSONObject result) {
+                            view.hideLoading();
+                            try {
+                                boolean success = result.getBoolean("success");
+                                String message = result.getString("message");
+
+                                if (success) {
+                                    view.showMessage(message);
+                                    view.onContactUpdated();
+                                } else {
+                                    view.showError(message);
+                                }
+                            } catch (JSONException e) {
+                                view.showError("Error al procesar la respuesta: " + e.getMessage());
+                            }
+                        }
+
+                        @Override
+                        public void onError(String error) {
+                            view.hideLoading();
+                            view.showError("Error al actualizar el contacto: " + error);
+                        }
+                    });
+
+        } catch (Exception e) {
+            view.hideLoading();
+            view.showError("Error al procesar la solicitud: " + e.getMessage());
+        }
+    }
+
     private boolean validateInput(String name, String phone, String imagePath) {
         if (name == null || name.trim().isEmpty()) {
             view.showError("El nombre es requerido");

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".view.activities.MapActivity">
+
+    <!-- Vista del mapa que ocupará toda la pantalla -->
+    <FrameLayout
+        android:id="@+id/mapContainer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- Aquí usaremos una imagen para simular el mapa, pero en una implementación real
+             se usaría Google Maps o alguna otra biblioteca de mapas -->
+        <ImageView
+            android:id="@+id/mapImageView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:contentDescription="@string/map_description"
+            android:background="@drawable/map_background"/>
+
+        <!-- Marcador de posición en el mapa -->
+        <ImageView
+            android:id="@+id/markerImageView"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center"
+            android:contentDescription="@string/marker_description"
+            android:src="@drawable/ic_location_marker"/>
+    </FrameLayout>
+
+    <!-- Información del contacto en la parte superior -->
+    <LinearLayout
+        android:id="@+id/infoLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="#80FFFFFF"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/txtContactName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            tools:text="Nombre del Contacto" />
+
+        <TextView
+            android:id="@+id/txtCoordinates"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="@color/black"
+            tools:text="Lat: 15.5046, Long: -88.0248" />
+    </LinearLayout>
+
+    <!-- Botón flotante para abrir Google Maps -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabOpenMaps"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:contentDescription="@string/open_maps"
+        android:src="@android:drawable/ic_dialog_map"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

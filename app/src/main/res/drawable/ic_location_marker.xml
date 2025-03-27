@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Sombra del marcador -->
+    <path
+        android:fillColor="#40000000"
+        android:pathData="M12,21.5C17,16 21,13 21,9C21,4.5 17,1 12,1C7,1 3,4.5 3,9C3,13 7,16 12,21.5Z" />
+
+    <!-- Cuerpo del marcador -->
+    <path
+        android:fillColor="#4CAF50"
+        android:pathData="M12,21C17,15.5 20,12.5 20,9C20,5 16.5,2 12,2C7.5,2 4,5 4,9C4,12.5 7,15.5 12,21Z" />
+
+    <!-- Círculo interior del marcador -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M12,12C13.6569,12 15,10.6569 15,9C15,7.3431 13.6569,6 12,6C10.3431,6 9,7.3431 9,9C9,10.6569 10.3431,12 12,12Z" />
+</vector>

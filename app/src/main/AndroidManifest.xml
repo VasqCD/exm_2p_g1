@@ -41,6 +41,15 @@
                 android:value="" />
         </activity>
 
+        <activity
+            android:name=".view.activities.MapActivity"
+            android:exported="false"
+            android:label="Ubicación de Contacto">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"

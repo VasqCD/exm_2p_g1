@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.pm1e2p_grup1.R;
 import com.example.pm1e2p_grup1.presenter.MainPresenter;
+import com.example.pm1e2p_grup1.utils.Constants;
 import com.example.pm1e2p_grup1.utils.LocationHelper;
 import com.example.pm1e2p_grup1.utils.PermissionHelper;
 import com.example.pm1e2p_grup1.view.interfaces.MainView;
@@ -31,6 +32,9 @@ public class MainActivity extends AppCompatActivity implements MainView {
     private Button btnTomarFoto, btnSalvarContacto, btnContactosSalvados;
     private double latitude = 0, longitude = 0;
     private ActivityResultLauncher<String[]> permissionsLauncher;
+
+    private boolean isUpdateMode = false;
+    private int contactId = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +74,9 @@ public class MainActivity extends AppCompatActivity implements MainView {
         // Inicializar presentador
         presenter = new MainPresenter(this, this);
 
+        // Verificar y procesar los datos de actualizacion
+        checkUpdateModeIntent();
+
         // Verificar y solicitar permisos
         checkAndRequestPermissions();
     }
@@ -90,11 +97,36 @@ public class MainActivity extends AppCompatActivity implements MainView {
         }
     }
 
+    private void checkUpdateModeIntent() {
+        Intent intent = getIntent();
+        if (intent != null && Constants.MODE_UPDATE.equals(intent.getStringExtra(Constants.EXTRA_MODE))) {
+            isUpdateMode = true;
+            contactId = intent.getIntExtra(Constants.EXTRA_CONTACT_ID, -1);
+
+            // Cargar datos del contacto
+            if (contactId != -1) {
+                String name = intent.getStringExtra(Constants.EXTRA_CONTACT_NAME);
+                String phone = intent.getStringExtra(Constants.EXTRA_PHONE);
+                latitude = intent.getDoubleExtra(Constants.EXTRA_LATITUDE, 0);
+                longitude = intent.getDoubleExtra(Constants.EXTRA_LONGITUDE, 0);
+
+                // Actualizar UI
+                etNombre.setText(name);
+                etTelefono.setText(phone);
+                etLatitud.setText(String.valueOf(latitude));
+                etLongitud.setText(String.valueOf(longitude));
+
+                // Cambiar texto del botón
+                btnSalvarContacto.setText("Actualizar Contacto");
+            }
+        }
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
         if (PermissionHelper.hasPermissions(this, PermissionHelper.getRequiredPermissions()) &&
-                (latitude == 0 && longitude == 0)) {
+                !isUpdateMode && (latitude == 0 && longitude == 0)) {
             if (LocationHelper.isGpsEnabled(this)) {
                 presenter.getCurrentLocation();
             }
@@ -119,11 +151,14 @@ public class MainActivity extends AppCompatActivity implements MainView {
         etLatitud.setEnabled(false);
         etLongitud.setEnabled(false);
 
-        // Verificar GPS y obtener ubicación
-        if (!LocationHelper.isGpsEnabled(this)) {
-            showGpsAlert();
-        } else {
-            presenter.getCurrentLocation();
+        // En modo actualización, no actualizar la ubicación automáticamente
+        if (!isUpdateMode) {
+            // Verificar GPS y obtener ubicación
+            if (!LocationHelper.isGpsEnabled(this)) {
+                showGpsAlert();
+            } else {
+                presenter.getCurrentLocation();
+            }
         }
     }
 
@@ -145,7 +180,11 @@ public class MainActivity extends AppCompatActivity implements MainView {
                     double latitude = Double.parseDouble(etLatitud.getText().toString());
                     double longitude = Double.parseDouble(etLongitud.getText().toString());
 
-                    presenter.saveContact(name, phone, latitude, longitude, presenter.getCurrentPhotoPath());
+                    if (isUpdateMode && contactId != -1) {
+                        presenter.updateContact(contactId, name, phone, latitude, longitude, presenter.getCurrentPhotoPath());
+                    } else {
+                        presenter.saveContact(name, phone, latitude, longitude, presenter.getCurrentPhotoPath());
+                    }
                 } catch (NumberFormatException e) {
                     showError("Error en el formato de coordenadas");
                 }
@@ -172,7 +211,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
             return false;
         }
 
-        if (presenter.getCurrentPhotoPath() == null) {
+        if (!isUpdateMode && presenter.getCurrentPhotoPath() == null) {
             showError("Se requiere tomar una fotografía");
             return false;
         }
@@ -265,6 +304,13 @@ public class MainActivity extends AppCompatActivity implements MainView {
     }
 
     @Override
+    public void onContactUpdated() {
+        // Devolver resultado OK a la actividad anterior
+        setResult(RESULT_OK);
+        finish();
+    }
+
+    @Override
     public void navigateToContactList() {
         Intent intent = new Intent(this, ContactListActivity.class);
         startActivity(intent);
@@ -277,12 +323,12 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
     @Override
     public void showLoading() {
-
+        // Implementar si es necesario mostrar un indicador de carga
     }
 
     @Override
     public void hideLoading() {
-
+        // Implementar si es necesario ocultar un indicador de carga
     }
 
     private void logError(String method, Exception e) {

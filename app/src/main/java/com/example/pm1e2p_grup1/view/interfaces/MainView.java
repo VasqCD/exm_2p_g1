@@ -13,4 +13,5 @@ public interface MainView {
     void showLoading();
     void hideLoading();
     void launchCameraIntent(Uri photoUri);
+    void onContactUpdated();
 }
