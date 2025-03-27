@@ -241,6 +241,8 @@ public class ContactListActivity extends AppCompatActivity implements ContactLis
         // Guardar el contacto seleccionado y habilitar botones
         selectedContact = contact;
         setButtonsEnabled(true);
+
+        showLocationDialog(contact);
     }
 
     // Método para mostrar diálogo de confirmación para ir a ubicación
