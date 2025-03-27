@@ -196,9 +196,7 @@ public class MainPresenter {
                 },
                 error -> {
                     view.hideLoading();
-                    view.showError("Error de ubicación: " + error);
-                    // Valores por defecto
-                    view.displayLocation(15.5063, -88.0249);
+                    view.showError("Error de ubicación GPS Desactivado");
                 }
         );
     }

@@ -90,6 +90,17 @@ public class MainActivity extends AppCompatActivity implements MainView {
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (PermissionHelper.hasPermissions(this, PermissionHelper.getRequiredPermissions()) &&
+                (latitude == 0 && longitude == 0)) {
+            if (LocationHelper.isGpsEnabled(this)) {
+                presenter.getCurrentLocation();
+            }
+        }
+    }
+
     private void checkAndRequestPermissions() {
         String[] requiredPermissions = PermissionHelper.getRequiredPermissions();
 
@@ -104,8 +115,16 @@ public class MainActivity extends AppCompatActivity implements MainView {
         // Configurar listeners
         setupListeners();
 
-        // Obtener ubicación
-        presenter.getCurrentLocation();
+        // Bloquear campos de coordenadas
+        etLatitud.setEnabled(false);
+        etLongitud.setEnabled(false);
+
+        // Verificar GPS y obtener ubicación
+        if (!LocationHelper.isGpsEnabled(this)) {
+            showGpsAlert();
+        } else {
+            presenter.getCurrentLocation();
+        }
     }
 
     private void setupListeners() {
