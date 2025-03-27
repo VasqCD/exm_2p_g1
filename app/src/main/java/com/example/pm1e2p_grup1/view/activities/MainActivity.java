@@ -7,6 +7,8 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
@@ -107,6 +109,22 @@ public class MainActivity extends AppCompatActivity implements MainView {
             btnSalvarContacto = findViewById(R.id.btnSalvarContacto);
             btnContactosSalvados = findViewById(R.id.btnContactosSalvados);
 
+            etTelefono.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    validatePhoneNumber(s.toString());
+                }
+            });
+
         } catch (Exception e) {
             logError("initViews", e);
         }
@@ -145,7 +163,6 @@ public class MainActivity extends AppCompatActivity implements MainView {
         }
     }
 
-    // AÑADIR ESTE MÉTODO para cargar la imagen desde la URL
     private void cargarImagenDesdeUrl(String photoUrl) {
         if (photoUrl != null && !photoUrl.isEmpty()) {
             showLoading();
@@ -289,8 +306,18 @@ public class MainActivity extends AppCompatActivity implements MainView {
             return false;
         }
 
-        if (etTelefono.getText().toString().trim().isEmpty()) {
+        String phoneNumber = etTelefono.getText().toString().trim();
+        if (phoneNumber.isEmpty()) {
             showError("El teléfono es requerido");
+            return false;
+        } else if (phoneNumber.length() != 8) {
+            showError("El teléfono debe tener exactamente 8 dígitos");
+            return false;
+        } else if (!phoneNumber.matches("^[0-9]+$")) {
+            showError("El teléfono solo debe contener números");
+            return false;
+        } else if (!phoneNumber.matches("^[389].*$")) {
+            showError("El teléfono debe comenzar con 3, 8 o 9");
             return false;
         }
 
@@ -306,6 +333,20 @@ public class MainActivity extends AppCompatActivity implements MainView {
         }
 
         return true;
+    }
+
+    private void validatePhoneNumber(String phoneNumber) {
+        if (phoneNumber.isEmpty()) {
+            etTelefono.setError("El teléfono es requerido");
+        } else if (phoneNumber.length() != 8) {
+            etTelefono.setError("El teléfono debe tener exactamente 8 dígitos");
+        } else if (!phoneNumber.matches("^[0-9]+$")) {
+            etTelefono.setError("El teléfono solo debe contener números");
+        } else if (!phoneNumber.matches("^[389].*$")) {
+            etTelefono.setError("El teléfono debe comenzar con 3, 8 o 9");
+        } else {
+            etTelefono.setError(null);
+        }
     }
 
     private void showPermissionDialog() {
