@@ -249,8 +249,19 @@ public class MainActivity extends AppCompatActivity implements MainView {
         etTelefono.setText("");
         etLatitud.setText("");
         etLongitud.setText("");
-        ivFotoPerfil.setImageResource(R.drawable.logo_utm); // Asegúrate de tener esta imagen
+        ivFotoPerfil.setImageResource(R.drawable.logo_utm);
         presenter.setCurrentPhotoPath(null);
+
+        // Resetear los valores de latitud y longitud
+        this.latitude = 0;
+        this.longitude = 0;
+
+        // Verificar GPS y obtener nueva ubicación
+        if (LocationHelper.isGpsEnabled(this)) {
+            presenter.getCurrentLocation();
+        } else {
+            showGpsAlert();
+        }
     }
 
     @Override

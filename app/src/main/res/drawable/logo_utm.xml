@@ -5,21 +5,24 @@
     android:viewportWidth="120"
     android:viewportHeight="80">
 
-    <!-- Círculo amarillo para simular el logo UTM -->
+    <!-- Círculo base para la cámara -->
     <path
         android:fillColor="#FFC107"
         android:pathData="M60,40m-30,0a30,30 0,1 1,60 0a30,30 0,1 1,-60 0" />
 
-    <!-- Letras UTM simplificadas -->
+    <!-- Cuerpo de la cámara -->
     <path
         android:fillColor="#000000"
-        android:pathData="M40,30L45,30L45,50L40,50Z" />
+        android:pathData="M45,32L75,32L75,55L45,55Z" />
 
+    <!-- Lente de la cámara -->
     <path
-        android:fillColor="#000000"
-        android:pathData="M55,30L65,30L65,35L60,35L60,50L55,50Z" />
+        android:fillColor="#FFFFFF"
+        android:pathData="M60,43m-8,0a8,8 0,1 1,16 0a8,8 0,1 1,-16 0" />
 
+    <!-- Flash de la cámara -->
     <path
-        android:fillColor="#000000"
-        android:pathData="M75,30L80,30L85,40L90,30L95,30L85,50L75,50Z" />
+        android:fillColor="#FFFFFF"
+        android:pathData="M70,38L73,38L73,35L70,35Z" />
+
 </vector>
